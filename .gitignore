@@ -1,0 +1,9 @@
+.github/skills/
+.venv/
+__pycache__/
+*.pyc
+node_modules/
+dist/
+.vite/
+.env
+.superpowers/
