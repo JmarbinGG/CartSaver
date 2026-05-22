@@ -1,0 +1,20 @@
+[
+  {
+    "product_id": "ic-100",
+    "product_name": "Whole Milk 1 Gallon",
+    "price": 3.79,
+    "unit_price": 0.0,
+    "store_id": "inst-001",
+    "store_name": "Instacart Partner Store",
+    "availability": "in_stock"
+  },
+  {
+    "product_id": "ic-200",
+    "product_name": "Large Eggs - 12ct",
+    "price": 3.19,
+    "unit_price": 0.27,
+    "store_id": "inst-001",
+    "store_name": "Instacart Partner Store",
+    "availability": "in_stock"
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "product_id": "kg-001",
+    "product_name": "Whole Milk 1gal",
+    "price": 3.49,
+    "unit_price": 0.0,
+    "store_id": "kroger-001",
+    "store_name": "Kroger Local",
+    "availability": "in_stock"
+  },
+  {
+    "product_id": "kg-002",
+    "product_name": "Large Eggs Dozen",
+    "price": 2.99,
+    "unit_price": 0.25,
+    "store_id": "kroger-001",
+    "store_name": "Kroger Local",
+    "availability": "in_stock"
+  }
+]
