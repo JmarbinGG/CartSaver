@@ -14,3 +14,4 @@ class StoreListing(BaseModel):
 class SearchResponse(BaseModel):
     query: str
     results: dict[str, list[StoreListing]]
+    deals: dict[str, list[StoreListing]] | None = None
