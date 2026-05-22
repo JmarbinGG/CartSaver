@@ -6,6 +6,7 @@
     "unit_price": 0.0,
     "store_id": "inst-001",
     "store_name": "Instacart Partner Store",
+    "store_zip": "02139",
     "availability": "in_stock"
   },
   {
@@ -15,6 +16,7 @@
     "unit_price": 0.27,
     "store_id": "inst-001",
     "store_name": "Instacart Partner Store",
+    "store_zip": "02139",
     "availability": "in_stock"
   }
 ]
