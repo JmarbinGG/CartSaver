@@ -16,3 +16,4 @@ def test_search_endpoint():
         listing = first_store[0]
         assert "distance_miles" in listing
         assert "eta_minutes" in listing
+        assert "store_zip" in listing
