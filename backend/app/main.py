@@ -5,6 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.models.base import Base
 from app.db import engine
 
+# Ensure DB tables exist at import time for test and runtime convenience
+Base.metadata.create_all(bind=engine)
+
 app = FastAPI(title="CartSaver API")
 
 app.add_middleware(
@@ -27,5 +30,5 @@ app.include_router(optimize_router)
 
 @app.on_event("startup")
 def startup():
-    # Ensure DB tables exist
-    Base.metadata.create_all(bind=engine)
+    # no-op; tables are created at import time
+    return
