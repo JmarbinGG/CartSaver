@@ -11,3 +11,8 @@ def test_search_endpoint():
     data = resp.json()
     assert data["query"] == "milk"
     assert isinstance(data["results"], dict)
+    first_store = next(iter(data["results"].values()), [])
+    if first_store:
+        listing = first_store[0]
+        assert "distance_miles" in listing
+        assert "eta_minutes" in listing

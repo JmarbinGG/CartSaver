@@ -21,7 +21,7 @@ def _load_from_db(query: str, zip_code: str | None) -> Tuple[List[Dict], Dict[st
         rows = (
             session.query(CachedSearchResult)
             .filter(CachedSearchResult.query == query)
-            .filter(CachedSearchResult.zip_code == (zip_code or ""))
+            .filter(CachedSearchResult.query_zip == (zip_code or ""))
             .all()
         )
         if not rows:
@@ -34,10 +34,12 @@ def _load_from_db(query: str, zip_code: str | None) -> Tuple[List[Dict], Dict[st
                 "product_name": r.product_name,
                 "store_id": r.store_id,
                 "store_name": r.store_name,
+                "store_zip": r.store_zip,
                 "price": float(r.price),
                 "unit_price": float(r.unit_price) if r.unit_price is not None else None,
                 "availability": r.availability,
-                "store_zip": r.zip_code,
+                "distance_miles": r.distance_miles,
+                "eta_minutes": r.eta_minutes,
             }
             normalized.append(item)
             grouped.setdefault(r.store_id or "unknown", []).append(item)
@@ -97,11 +99,12 @@ def set_cached(query: str, zip_code: str | None, normalized_listings: List[Dict]
     # persist to DB: remove existing for this query+zip, then insert
     session = SessionLocal()
     try:
-        session.query(CachedSearchResult).filter(CachedSearchResult.query == query).filter(CachedSearchResult.zip_code == (zip_code or "")).delete()
+        session.query(CachedSearchResult).filter(CachedSearchResult.query == query).filter(CachedSearchResult.query_zip == (zip_code or "")).delete()
         for item in normalized_listings:
             row = CachedSearchResult(
                 query=query,
-                zip_code=zip_code or "",
+                query_zip=zip_code or "",
+                store_zip=item.get("store_zip"),
                 product_id=item.get("product_id"),
                 product_name=item.get("product_name"),
                 store_id=item.get("store_id"),
@@ -109,6 +112,8 @@ def set_cached(query: str, zip_code: str | None, normalized_listings: List[Dict]
                 price=float(item.get("price", 0.0)),
                 unit_price=float(item.get("unit_price")) if item.get("unit_price") not in (None, 0, 0.0) else None,
                 availability=item.get("availability", "unknown"),
+                distance_miles=item.get("distance_miles"),
+                eta_minutes=item.get("eta_minutes"),
                 retrieved_at=time.time(),
             )
             session.add(row)

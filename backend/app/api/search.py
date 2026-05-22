@@ -4,6 +4,7 @@ from typing import List, Dict
 from app.providers.kroger_mock import KrogerMock
 from app.providers.instacart_mock import InstacartMock
 from app.services.normalization import normalize_listing
+from app.services.distance import distance_between_zips
 from app.services.cache import get_cached, set_cached
 from app.schemas.search import StoreListing, SearchResponse
 
@@ -33,6 +34,16 @@ def search(query: str = Query(...), zip_code: str | None = None):
         return SearchResponse(query=query, results=grouped_obj, deals=deals_obj)
 
     normalized = [normalize_listing(r) for r in raw_results]
+
+    for item in normalized:
+        try:
+            if item.get("store_zip") and zip_code:
+                miles = distance_between_zips(zip_code, item.get("store_zip"))
+                item["distance_miles"] = round(miles, 2)
+                item["eta_minutes"] = int(round((miles / 30.0) * 60))
+        except Exception:
+            item["distance_miles"] = None
+            item["eta_minutes"] = None
 
     # group by store_id
     grouped: Dict[str, List[StoreListing]] = {}

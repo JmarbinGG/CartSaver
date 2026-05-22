@@ -9,6 +9,7 @@ def normalize_listing(raw: Dict) -> Dict:
     return {
         "store_id": raw.get("store_id") or raw.get("vendor_id") or "",
         "store_name": raw.get("store_name") or raw.get("vendor_name") or "",
+        "store_zip": raw.get("store_zip"),
         "product_id": raw.get("product_id") or raw.get("id") or "",
         "product_name": raw.get("product_name") or raw.get("name") or "",
         "price": float(raw.get("price") or raw.get("sale_price") or 0.0),
