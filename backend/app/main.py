@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from app.api.search import router as search_router
 from app.api.optimize import router as optimize_router
 from fastapi.middleware.cors import CORSMiddleware
+from app.models.base import Base
+from app.db import engine
 
 app = FastAPI(title="CartSaver API")
 
@@ -21,3 +23,9 @@ def health():
 
 app.include_router(search_router)
 app.include_router(optimize_router)
+
+
+@app.on_event("startup")
+def startup():
+    # Ensure DB tables exist
+    Base.metadata.create_all(bind=engine)
