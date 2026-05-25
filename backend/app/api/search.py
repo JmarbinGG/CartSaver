@@ -41,7 +41,7 @@ def search(query: str = Query(...), zip_code: str | None = None):
                 miles = distance_between_zips(zip_code, item.get("store_zip"))
                 item["distance_miles"] = round(miles, 2)
                 item["eta_minutes"] = int(round((miles / 30.0) * 60))
-        except Exception:
+        except (KeyError, ValueError, TypeError):
             item["distance_miles"] = None
             item["eta_minutes"] = None
 

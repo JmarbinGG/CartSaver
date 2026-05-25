@@ -6,10 +6,13 @@ def normalize_listing(raw: Dict) -> Dict:
 
     Ensures keys: store_id, store_name, product_id, product_name, price, unit_price, availability
     """
+    store_zip = raw.get("store_zip")
+    if store_zip is not None:
+        store_zip = str(store_zip).zfill(5)
     return {
         "store_id": raw.get("store_id") or raw.get("vendor_id") or "",
         "store_name": raw.get("store_name") or raw.get("vendor_name") or "",
-        "store_zip": raw.get("store_zip"),
+        "store_zip": store_zip,
         "product_id": raw.get("product_id") or raw.get("id") or "",
         "product_name": raw.get("product_name") or raw.get("name") or "",
         "price": float(raw.get("price") or raw.get("sale_price") or 0.0),
