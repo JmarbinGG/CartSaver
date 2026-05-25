@@ -16,6 +16,12 @@ def search(query: str = Query(...), zip_code: str | None = None):
     kroger = KrogerMock()
     insta = InstacartMock()
 
+    normalized_zip = None
+    if zip_code is not None:
+        zip_str = str(zip_code).strip()
+        if zip_str.isdigit():
+            normalized_zip = zip_str.zfill(5)
+
     raw_results = []
     raw_results.extend(kroger.search(query, zip_code))
     raw_results.extend(insta.search(query, zip_code))
@@ -37,8 +43,8 @@ def search(query: str = Query(...), zip_code: str | None = None):
 
     for item in normalized:
         try:
-            if item.get("store_zip") and zip_code:
-                miles = distance_between_zips(zip_code, item.get("store_zip"))
+            if item.get("store_zip") and normalized_zip:
+                miles = distance_between_zips(normalized_zip, item.get("store_zip"))
                 item["distance_miles"] = round(miles, 2)
                 item["eta_minutes"] = int(round((miles / 30.0) * 60))
         except (KeyError, ValueError, TypeError):

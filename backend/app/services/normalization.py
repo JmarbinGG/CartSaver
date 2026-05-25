@@ -8,7 +8,11 @@ def normalize_listing(raw: Dict) -> Dict:
     """
     store_zip = raw.get("store_zip")
     if store_zip is not None:
-        store_zip = str(store_zip).zfill(5)
+        store_zip = str(store_zip).strip()
+        if store_zip and store_zip.isdigit():
+            store_zip = store_zip.zfill(5)
+        else:
+            store_zip = None
     return {
         "store_id": raw.get("store_id") or raw.get("vendor_id") or "",
         "store_name": raw.get("store_name") or raw.get("vendor_name") or "",

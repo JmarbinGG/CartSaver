@@ -17,6 +17,8 @@ def test_search_endpoint():
         assert "distance_miles" in listing
         assert "eta_minutes" in listing
         assert "store_zip" in listing
+        assert listing["distance_miles"] is not None
+        assert listing["eta_minutes"] is not None
 
     # second call should hit cache without errors
     resp_cached = client.get("/search", params={"query": "milk", "zip_code": "02139"})
@@ -28,3 +30,5 @@ def test_search_endpoint():
         assert "distance_miles" in listing_cached
         assert "eta_minutes" in listing_cached
         assert "store_zip" in listing_cached
+        assert listing_cached["distance_miles"] is not None
+        assert listing_cached["eta_minutes"] is not None
