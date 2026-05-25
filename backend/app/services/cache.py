@@ -17,6 +17,11 @@ def _rebuild_cache_table():
     except Exception as exc:
         logger.warning("Cache table rebuild failed: %s", exc)
 
+
+def _is_schema_mismatch(exc: OperationalError) -> bool:
+    message = str(exc).lower()
+    return "no such column" in message or "has no column" in message
+
 # Simple in-memory cache for search results
 # Keyed by "query::zip"
 _cache: Dict[str, Dict[str, Any]] = {}
@@ -59,8 +64,11 @@ def _load_from_db(query: str, zip_code: str | None) -> Tuple[List[Dict], Dict[st
         return normalized, grouped
     except OperationalError as exc:
         # DB schema mismatch or missing columns; fall back to empty cache
-        logger.warning("Cache DB read failed; rebuilding cache table: %s", exc)
-        _rebuild_cache_table()
+        if _is_schema_mismatch(exc):
+            logger.warning("Cache DB read failed; rebuilding cache table: %s", exc)
+            _rebuild_cache_table()
+        else:
+            logger.warning("Cache DB read failed; using in-memory only: %s", exc)
         return [], {}
     finally:
         session.close()
@@ -139,8 +147,11 @@ def set_cached(query: str, zip_code: str | None, normalized_listings: List[Dict]
     except OperationalError as exc:
         # Ignore DB persistence if schema mismatch; keep in-memory cache
         session.rollback()
-        logger.warning("Cache DB write failed; rebuilding cache table: %s", exc)
-        _rebuild_cache_table()
+        if _is_schema_mismatch(exc):
+            logger.warning("Cache DB write failed; rebuilding cache table: %s", exc)
+            _rebuild_cache_table()
+        else:
+            logger.warning("Cache DB write failed; using in-memory only: %s", exc)
     finally:
         session.close()
 
