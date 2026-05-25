@@ -25,9 +25,6 @@ def _load_from_db(query: str, zip_code: str | None) -> Tuple[List[Dict], Dict[st
             .filter(CachedSearchResult.query_zip == (zip_code or ""))
             .all()
         )
-    except OperationalError:
-        # DB schema mismatch or missing columns; fall back to empty cache
-        return [], {}
         if not rows:
             return [], {}
         normalized = []
@@ -48,6 +45,9 @@ def _load_from_db(query: str, zip_code: str | None) -> Tuple[List[Dict], Dict[st
             normalized.append(item)
             grouped.setdefault(r.store_id or "unknown", []).append(item)
         return normalized, grouped
+    except OperationalError:
+        # DB schema mismatch or missing columns; fall back to empty cache
+        return [], {}
     finally:
         session.close()
 

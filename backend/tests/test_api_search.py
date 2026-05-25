@@ -17,3 +17,14 @@ def test_search_endpoint():
         assert "distance_miles" in listing
         assert "eta_minutes" in listing
         assert "store_zip" in listing
+
+    # second call should hit cache without errors
+    resp_cached = client.get("/search", params={"query": "milk", "zip_code": "02139"})
+    assert resp_cached.status_code == 200
+    data_cached = resp_cached.json()
+    first_store_cached = next(iter(data_cached["results"].values()), [])
+    if first_store_cached:
+        listing_cached = first_store_cached[0]
+        assert "distance_miles" in listing_cached
+        assert "eta_minutes" in listing_cached
+        assert "store_zip" in listing_cached
