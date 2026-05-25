@@ -1,9 +1,12 @@
 import time
+import logging
 from typing import Dict, List, Any, Tuple
 
 from app.db import SessionLocal
 from app.models.cache import CachedSearchResult
 from sqlalchemy.exc import OperationalError
+
+logger = logging.getLogger(__name__)
 
 # Simple in-memory cache for search results
 # Keyed by "query::zip"
@@ -45,8 +48,9 @@ def _load_from_db(query: str, zip_code: str | None) -> Tuple[List[Dict], Dict[st
             normalized.append(item)
             grouped.setdefault(r.store_id or "unknown", []).append(item)
         return normalized, grouped
-    except OperationalError:
+    except OperationalError as exc:
         # DB schema mismatch or missing columns; fall back to empty cache
+        logger.warning("Cache DB read failed; falling back to in-memory only: %s", exc)
         return [], {}
     finally:
         session.close()
@@ -122,9 +126,10 @@ def set_cached(query: str, zip_code: str | None, normalized_listings: List[Dict]
             )
             session.add(row)
         session.commit()
-    except OperationalError:
+    except OperationalError as exc:
         # Ignore DB persistence if schema mismatch; keep in-memory cache
         session.rollback()
+        logger.warning("Cache DB write failed; using in-memory cache only: %s", exc)
     finally:
         session.close()
 

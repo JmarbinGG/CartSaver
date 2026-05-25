@@ -17,17 +17,20 @@ def search(query: str = Query(...), zip_code: str | None = None):
     insta = InstacartMock()
 
     normalized_zip = None
+    raw_zip = None
     if zip_code is not None:
-        zip_str = str(zip_code).strip()
-        if zip_str.isdigit():
-            normalized_zip = zip_str.zfill(5)
+        raw_zip = str(zip_code).strip()
+        if raw_zip.isdigit():
+            normalized_zip = raw_zip.zfill(5)
+
+    search_zip = normalized_zip if normalized_zip is not None else raw_zip
 
     raw_results = []
-    raw_results.extend(kroger.search(query, zip_code))
-    raw_results.extend(insta.search(query, zip_code))
+    raw_results.extend(kroger.search(query, search_zip))
+    raw_results.extend(insta.search(query, search_zip))
 
     # check cache first
-    cached = get_cached(query, zip_code)
+    cached = get_cached(query, search_zip)
     if cached:
         results_flat, grouped_cached, deals_cached = cached
         # convert grouped to StoreListing objects
@@ -59,6 +62,6 @@ def search(query: str = Query(...), zip_code: str | None = None):
         grouped.setdefault(store, []).append(listing)
 
     # store in cache (flat normalized list)
-    grouped_cache, deals = set_cached(query, zip_code, normalized)
+    grouped_cache, deals = set_cached(query, search_zip, normalized)
 
     return SearchResponse(query=query, results=grouped, deals={s: [StoreListing(**i) for i in items] for s, items in deals.items()} if deals else None)
