@@ -2,11 +2,20 @@ import time
 import logging
 from typing import Dict, List, Any, Tuple
 
-from app.db import SessionLocal
+from app.db import SessionLocal, engine
 from app.models.cache import CachedSearchResult
 from sqlalchemy.exc import OperationalError
 
 logger = logging.getLogger(__name__)
+
+
+def _rebuild_cache_table():
+    # Cache is derived data; safe to rebuild if schema mismatch occurs.
+    try:
+        CachedSearchResult.__table__.drop(bind=engine, checkfirst=True)
+        CachedSearchResult.__table__.create(bind=engine, checkfirst=True)
+    except Exception as exc:
+        logger.warning("Cache table rebuild failed: %s", exc)
 
 # Simple in-memory cache for search results
 # Keyed by "query::zip"
@@ -50,7 +59,8 @@ def _load_from_db(query: str, zip_code: str | None) -> Tuple[List[Dict], Dict[st
         return normalized, grouped
     except OperationalError as exc:
         # DB schema mismatch or missing columns; fall back to empty cache
-        logger.warning("Cache DB read failed; falling back to in-memory only: %s", exc)
+        logger.warning("Cache DB read failed; rebuilding cache table: %s", exc)
+        _rebuild_cache_table()
         return [], {}
     finally:
         session.close()
@@ -129,7 +139,8 @@ def set_cached(query: str, zip_code: str | None, normalized_listings: List[Dict]
     except OperationalError as exc:
         # Ignore DB persistence if schema mismatch; keep in-memory cache
         session.rollback()
-        logger.warning("Cache DB write failed; using in-memory cache only: %s", exc)
+        logger.warning("Cache DB write failed; rebuilding cache table: %s", exc)
+        _rebuild_cache_table()
     finally:
         session.close()
 

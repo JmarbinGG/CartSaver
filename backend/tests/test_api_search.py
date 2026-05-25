@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
 from app.main import app
+from app.services.cache import clear_cache
 
 
 client = TestClient(app)
@@ -21,6 +22,7 @@ def test_search_endpoint():
         assert listing["eta_minutes"] is not None
 
     # second call should hit cache without errors
+    clear_cache()
     resp_cached = client.get("/search", params={"query": "milk", "zip_code": "02139"})
     assert resp_cached.status_code == 200
     data_cached = resp_cached.json()

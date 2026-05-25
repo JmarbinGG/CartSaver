@@ -25,10 +25,6 @@ def search(query: str = Query(...), zip_code: str | None = None):
 
     search_zip = normalized_zip if normalized_zip is not None else raw_zip
 
-    raw_results = []
-    raw_results.extend(kroger.search(query, search_zip))
-    raw_results.extend(insta.search(query, search_zip))
-
     # check cache first
     cached = get_cached(query, search_zip)
     if cached:
@@ -41,6 +37,10 @@ def search(query: str = Query(...), zip_code: str | None = None):
         if deals_cached:
             deals_obj = {s: [StoreListing(**i) for i in items] for s, items in deals_cached.items()}
         return SearchResponse(query=query, results=grouped_obj, deals=deals_obj)
+
+    raw_results = []
+    raw_results.extend(kroger.search(query, search_zip))
+    raw_results.extend(insta.search(query, search_zip))
 
     normalized = [normalize_listing(r) for r in raw_results]
 
