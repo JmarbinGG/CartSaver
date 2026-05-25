@@ -3,6 +3,7 @@ from typing import Dict, List, Any, Tuple
 
 from app.db import SessionLocal
 from app.models.cache import CachedSearchResult
+from sqlalchemy.exc import OperationalError
 
 # Simple in-memory cache for search results
 # Keyed by "query::zip"
@@ -24,6 +25,9 @@ def _load_from_db(query: str, zip_code: str | None) -> Tuple[List[Dict], Dict[st
             .filter(CachedSearchResult.query_zip == (zip_code or ""))
             .all()
         )
+    except OperationalError:
+        # DB schema mismatch or missing columns; fall back to empty cache
+        return [], {}
         if not rows:
             return [], {}
         normalized = []
@@ -118,6 +122,9 @@ def set_cached(query: str, zip_code: str | None, normalized_listings: List[Dict]
             )
             session.add(row)
         session.commit()
+    except OperationalError:
+        # Ignore DB persistence if schema mismatch; keep in-memory cache
+        session.rollback()
     finally:
         session.close()
 
