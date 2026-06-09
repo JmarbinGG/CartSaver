@@ -1,192 +1,213 @@
-import React, { useEffect, useRef, useState } from 'react'
-
-type Suggestion = {
-  product_id: string
-  product_name: string
-  store_id?: string
-  store_name?: string
-}
+import React, { useEffect, useState } from 'react'
+import { BoltIcon, CloseIcon, ListIcon, MapPinIcon } from './Icon'
 
 type Item = {
   product_id: string
   product_name: string
   quantity: number
+  store_id?: string
+  store_name?: string
+  price?: number
+}
+
+type Assignment = {
+  product_id: string
+  product_name: string
+  store_id: string
+  store_name: string
+  price: number
+}
+
+type OptimizeResult = {
+  assignments: Assignment[]
+  total_item_cost: number
+  travel_cost: number
+  total_cost: number
 }
 
 type Props = {
-  onOptimizeResult?: (r: any) => void
+  listVersion?: number
+  zip: string
+  onOptimizeResult?: (r: OptimizeResult) => void
 }
 
-export default function ShoppingList({ onOptimizeResult }: Props) {
+function groupByStore(assignments: Assignment[]) {
+  const map: Record<string, Assignment[]> = {}
+  for (const a of assignments) {
+    const key = a.store_name || a.store_id
+    if (!map[key]) map[key] = []
+    map[key].push(a)
+  }
+  return map
+}
+
+export default function ShoppingList({ listVersion, zip, onOptimizeResult }: Props) {
   const [items, setItems] = useState<Item[]>(() => {
-    try {
-      return JSON.parse(localStorage.getItem('cartsaver:list') || '[]')
-    } catch {
-      return []
-    }
+    try { return JSON.parse(localStorage.getItem('cartsaver:list') || '[]') } catch { return [] }
   })
-  const [query, setQuery] = useState('')
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([])
   const [loading, setLoading] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const abortRef = useRef<AbortController | null>(null)
+  const [plan, setPlan] = useState<OptimizeResult | null>(null)
 
   useEffect(() => {
     localStorage.setItem('cartsaver:list', JSON.stringify(items))
   }, [items])
 
   useEffect(() => {
-    if (!query || query.length < 2) {
-      setSuggestions([])
-      return
-    }
-    // debounce + abort previous
-    const ac = new AbortController()
-    abortRef.current?.abort()
-    abortRef.current = ac
-
-    const t = setTimeout(async () => {
-      try {
-        const res = await fetch(`/search?query=${encodeURIComponent(query)}&zip_code=02139`, { signal: ac.signal })
-        if (!res.ok) return
-        const data = await res.json()
-        // flatten results to unique product suggestions
-        const flat: Suggestion[] = []
-        const seen = new Set<string>()
-        for (const store of Object.keys(data.results || {})) {
-          for (const p of data.results[store]) {
-            if (!seen.has(p.product_id)) {
-              seen.add(p.product_id)
-              flat.push({ product_id: p.product_id, product_name: p.product_name, store_id: p.store_id, store_name: p.store_name })
-            }
-          }
-        }
-        setSuggestions(flat.slice(0, 10))
-      } catch (err) {
-        // ignore
-      }
-    }, 250)
-
-    return () => { clearTimeout(t); ac.abort() }
-  }, [query])
-
-  function addSuggestion(s: Suggestion) {
-    setItems(prev => [...prev, { product_id: s.product_id, product_name: s.product_name, quantity: 1 }])
-    setQuery('')
-    setSuggestions([])
-  }
+    try { setItems(JSON.parse(localStorage.getItem('cartsaver:list') || '[]')) } catch { setItems([]) }
+  }, [listVersion])
 
   function updateQty(i: number, qty: number) {
-    setItems(prev => prev.map((it, idx) => idx === i ? { ...it, quantity: qty } : it))
+    setItems(prev => prev.map((it, idx) => idx === i ? { ...it, quantity: Math.max(1, qty) } : it))
+    setPlan(null)
   }
 
   function removeAt(i: number) {
     setItems(prev => prev.filter((_, idx) => idx !== i))
+    setPlan(null)
   }
 
   async function optimize() {
+    if (items.length === 0) return
     setLoading(true)
     try {
-      const payload = { items: items.map(it => ({ product_id: it.product_id, product_name: it.product_name, quantity: it.quantity })), zip_code: '02139' }
-      const resp = await fetch('/optimize', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+      const resp = await fetch('http://localhost:8000/optimize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: items.map(it => ({ product_id: it.product_id, product_name: it.product_name, quantity: it.quantity })),
+          zip_code: zip,
+        }),
       })
-      const data = await resp.json()
+      const data: OptimizeResult = await resp.json()
+      setPlan(data)
       onOptimizeResult?.(data)
     } finally {
       setLoading(false)
     }
   }
 
-  function saveList(name = `list-${Date.now()}`) {
-    setSaving(true)
-    try {
-      const saved = JSON.parse(localStorage.getItem('cartsaver:saved_lists') || '{}')
-      saved[name] = items
-      localStorage.setItem('cartsaver:saved_lists', JSON.stringify(saved))
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  function loadList(name: string) {
-    const saved = JSON.parse(localStorage.getItem('cartsaver:saved_lists') || '{}')
-    const list = saved[name] || []
-    setItems(list)
-  }
-
-  function deleteSaved(name: string) {
-    const saved = JSON.parse(localStorage.getItem('cartsaver:saved_lists') || '{}')
-    delete saved[name]
-    localStorage.setItem('cartsaver:saved_lists', JSON.stringify(saved))
-  }
-
-  const savedLists = Object.keys(JSON.parse(localStorage.getItem('cartsaver:saved_lists') || '{}'))
+  const subtotal = items.reduce((s, it) => s + (it.price || 0) * it.quantity, 0)
+  const storeGroups = plan ? groupByStore(plan.assignments) : null
 
   return (
-    <div>
-      <h2>Shopping List</h2>
+    <div className="list-page">
+      <div className="list-layout">
+        <div className="list-main">
+          <h2 className="list-title">My Shopping List</h2>
 
-      <div style={{ maxWidth: 640 }}>
-        <label>Find in-store item (type 2+ chars)</label>
-        <div style={{ position: 'relative' }}>
-          <input placeholder="Search products to add" value={query} onChange={(e) => setQuery(e.target.value)} />
-          {suggestions.length > 0 && (
-            <ul style={{ position: 'absolute', left: 0, right: 0, background: 'white', border: '1px solid #ddd', maxHeight: 200, overflow: 'auto', zIndex: 40 }}>
-              {suggestions.map((s, i) => (
-                <li key={s.product_id} style={{ padding: 8, cursor: 'pointer' }} onClick={() => addSuggestion(s)}>
-                  <div style={{ fontWeight: 600 }}>{s.product_name}</div>
-                  <div style={{ fontSize: 12, color: '#666' }}>{s.store_name}</div>
-                </li>
-              ))}
-            </ul>
+          {items.length === 0 ? (
+            <div className="cs-empty-state">
+              <div className="cs-empty-icon"><ListIcon size={36} /></div>
+              <div>Your list is empty.</div>
+              <div style={{ fontSize: 13, marginTop: 6, color: 'var(--muted-2)' }}>
+                Search for products and add them here.
+              </div>
+            </div>
+          ) : (
+            <>
+              <table className="list-table">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Store</th>
+                    <th style={{ textAlign: 'right' }}>Price</th>
+                    <th style={{ textAlign: 'center' }}>Qty</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((it, i) => (
+                    <tr key={i} className="list-row">
+                      <td className="list-product-name">{it.product_name}</td>
+                      <td className="list-store">{it.store_name || '—'}</td>
+                      <td className="list-price" style={{ textAlign: 'right' }}>
+                        {it.price ? `$${it.price.toFixed(2)}` : '—'}
+                      </td>
+                      <td style={{ textAlign: 'center' }}>
+                        <input
+                          type="number"
+                          min={1}
+                          value={it.quantity}
+                          onChange={e => updateQty(i, Number(e.target.value))}
+                          className="list-qty-input"
+                        />
+                      </td>
+                      <td style={{ textAlign: 'right' }}>
+                        <button className="btn list-remove-btn" onClick={() => removeAt(i)}>
+                          <CloseIcon size={10} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              <div className="list-actions">
+                <div className="list-subtotal">
+                  Subtotal: <strong>${subtotal.toFixed(2)}</strong>
+                </div>
+                <button
+                  className="btn btn-primary"
+                  onClick={optimize}
+                  disabled={loading}
+                >
+                  <BoltIcon size={13} color="#fff" />
+                  {loading ? 'Optimizing…' : 'Optimize Route'}
+                </button>
+                <button
+                  className="btn list-clear-btn"
+                  onClick={() => { setItems([]); setPlan(null) }}
+                >
+                  Clear list
+                </button>
+              </div>
+            </>
           )}
         </div>
-      </div>
 
-      <div style={{ marginTop: 12 }}>
-        <h3>Items</h3>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              <th style={{ textAlign: 'left' }}>Product</th>
-              <th>Qty</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((it, i) => (
-              <tr key={i} style={{ borderTop: '1px solid #eee' }}>
-                <td style={{ padding: '8px 4px' }}>{it.product_name}</td>
-                <td style={{ padding: '8px 4px', textAlign: 'center' }}>
-                  <input type="number" min={1} value={it.quantity} onChange={(e) => updateQty(i, Math.max(1, Number(e.target.value)))} style={{ width: 64 }} />
-                </td>
-                <td style={{ padding: '8px 4px', textAlign: 'right' }}>
-                  <button onClick={() => removeAt(i)}>Remove</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {plan && storeGroups && (
+          <div className="plan-panel">
+            <div className="plan-header">
+              <div className="plan-title">Your Shopping Plan</div>
+              <div className="plan-subtitle">Optimized for price + distance</div>
+            </div>
 
-        <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
-          <button onClick={optimize} disabled={items.length === 0 || loading}>{loading ? 'Optimizing…' : 'Optimize List'}</button>
-          <button onClick={() => saveList() } disabled={items.length === 0 || saving}>{saving ? 'Saving…' : 'Save List'}</button>
-        </div>
-      </div>
+            <div className="plan-body">
+              {Object.entries(storeGroups).map(([storeName, assignments]) => (
+                <div key={storeName} className="plan-store-block">
+                  <div className="plan-store-name">
+                    <MapPinIcon size={12} color="var(--green)" />
+                    {storeName}
+                  </div>
+                  <ul className="plan-items">
+                    {assignments.map((a, i) => (
+                      <li key={i} className="plan-item">
+                        <span className="plan-item-name">{a.product_name}</span>
+                        <span className="plan-item-dots" />
+                        <span className="plan-item-price">${a.price.toFixed(2)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
 
-      <div style={{ marginTop: 18 }}>
-        <h3>Saved Lists</h3>
-        {savedLists.length === 0 && <div><em>No saved lists</em></div>}
-        <ul>
-          {savedLists.map(name => (
-            <li key={name} style={{ marginTop: 8 }}>
-              {name}
-              <button style={{ marginLeft: 8 }} onClick={() => loadList(name)}>Load</button>
-              <button style={{ marginLeft: 8 }} onClick={() => { deleteSaved(name); window.location.reload() }}>Delete</button>
-            </li>
-          ))}
-        </ul>
+            <div className="plan-totals">
+              <div className="plan-total-row">
+                <span>Items</span>
+                <span>${plan.total_item_cost.toFixed(2)}</span>
+              </div>
+              <div className="plan-total-row">
+                <span>Travel estimate</span>
+                <span>${plan.travel_cost.toFixed(2)}</span>
+              </div>
+              <div className="plan-total-grand">
+                <span>Total</span>
+                <span>${plan.total_cost.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

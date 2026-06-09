@@ -7,3 +7,12 @@ dist/
 .vite/
 .env
 .superpowers/
+.agents/
+.claude/
+.pytest_cache/
+skills-lock.json
+backend/.pytest_cache/
+backend/tests
+backend/.env
+frontend/node_modules/
+frontend/dist/

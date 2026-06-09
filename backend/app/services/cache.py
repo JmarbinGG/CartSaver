@@ -167,3 +167,12 @@ def set_cached(query: str, zip_code: str | None, normalized_listings: List[Dict]
 def clear_cache():
     _cache.clear()
     _last_prices.clear()
+    session = SessionLocal()
+    try:
+        session.query(CachedSearchResult).delete()
+        session.commit()
+    except Exception as exc:
+        session.rollback()
+        logger.warning("clear_cache DB purge failed: %s", exc)
+    finally:
+        session.close()

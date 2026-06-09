@@ -1,63 +1,70 @@
 import React, { useState } from 'react'
+import { SearchIcon, LocationPinIcon } from './Icon'
 
 type Props = {
+  zip: string
+  onZipChange: (z: string) => void
   onResults?: (r: any) => void
 }
 
-export default function SearchForm({ onResults }: Props) {
+export default function SearchForm({ zip, onZipChange, onResults }: Props) {
   const [query, setQuery] = useState('')
-  const [zip, setZip] = useState('02139')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   async function doSearch() {
+    if (!query.trim()) return
     setLoading(true)
+    setError(null)
     try {
-      const res = await fetch(`/search?query=${encodeURIComponent(query)}&zip_code=${encodeURIComponent(zip)}`)
+      const res = await fetch(
+        `http://localhost:8000/search?query=${encodeURIComponent(query)}&zip_code=${encodeURIComponent(zip)}`
+      )
+      if (!res.ok) throw new Error(`API error ${res.status}`)
       const data = await res.json()
       onResults?.(data)
+    } catch {
+      setError('Search failed — is the backend running on port 8000?')
     } finally {
       setLoading(false)
     }
   }
 
-  async function doOptimize(results: any) {
-    // build a minimal shopping list payload from first product in results
-    const items: any[] = []
-    for (const store in results.results) {
-      const list = results.results[store]
-      if (list && list.length > 0) {
-        items.push({ product_id: list[0].product_id, product_name: list[0].product_name, quantity: 1 })
-      }
-    }
-    const resp = await fetch('/optimize', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items, zip_code: zip }),
-    })
-    const body = await resp.json()
-    onResults?.(body)
-  }
-
   return (
-    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-      <input placeholder="Search query" value={query} onChange={(e) => setQuery(e.target.value)} />
-      <input placeholder="ZIP" style={{ width: 100 }} value={zip} onChange={(e) => setZip(e.target.value)} />
-      <button onClick={doSearch} disabled={loading || !query}>Search</button>
-      <button
-        onClick={async () => {
-          setLoading(true)
-          try {
-            const res = await fetch(`/search?query=${encodeURIComponent(query)}&zip_code=${encodeURIComponent(zip)}`)
-            const data = await res.json()
-            await doOptimize(data)
-          } finally {
-            setLoading(false)
-          }
-        }}
-        disabled={loading || !query}
-      >
-        Optimize
-      </button>
+    <div className="cs-search-bar">
+      <div className="cs-search-inner">
+        <div className="cs-search-icon">
+          <SearchIcon size={17} />
+        </div>
+        <input
+          className="cs-search-input"
+          placeholder="Search groceries — milk, eggs, bread, butter…"
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && doSearch()}
+          autoFocus
+        />
+        <div className="cs-zip-divider" />
+        <div className="cs-zip-wrap">
+          <LocationPinIcon size={13} color="var(--muted)" />
+          <input
+            className="cs-zip-input"
+            placeholder="ZIP"
+            value={zip}
+            onChange={e => onZipChange(e.target.value)}
+            maxLength={5}
+            aria-label="ZIP code"
+          />
+        </div>
+        <button
+          className="btn btn-primary cs-search-btn"
+          onClick={doSearch}
+          disabled={loading || !query.trim()}
+        >
+          {loading ? <span className="cs-spinner" /> : 'Search'}
+        </button>
+      </div>
+      {error && <div className="cs-search-error">{error}</div>}
     </div>
   )
 }

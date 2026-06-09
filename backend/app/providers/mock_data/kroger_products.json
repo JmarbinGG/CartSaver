@@ -1,22 +1,98 @@
 [
   {
     "product_id": "kg-001",
-    "product_name": "Whole Milk 1gal",
+    "product_name": "Whole Milk 1 Gallon",
+    "brand": "Kroger",
     "price": 3.49,
-    "unit_price": 0.0,
-    "store_id": "kroger-001",
-    "store_name": "Kroger Local",
-    "store_zip": "02139",
-    "availability": "in_stock"
+    "unit_price": 0.027,
+    "store_id": "kroger-east-cambridge",
+    "store_name": "Kroger East Cambridge",
+    "store_zip": "02141",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/dbeafe/1d4ed8?text=Milk"
   },
   {
     "product_id": "kg-002",
-    "product_name": "Large Eggs Dozen",
+    "product_name": "Lucerne Whole Milk 1 Gallon",
+    "brand": "Lucerne",
+    "price": 3.89,
+    "unit_price": 0.03,
+    "store_id": "kroger-east-cambridge",
+    "store_name": "Kroger East Cambridge",
+    "store_zip": "02141",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/dbeafe/1d4ed8?text=Milk"
+  },
+  {
+    "product_id": "kg-003",
+    "product_name": "2% Reduced Fat Milk 1 Gallon",
+    "brand": "Kroger",
+    "price": 3.39,
+    "unit_price": 0.026,
+    "store_id": "kroger-east-cambridge",
+    "store_name": "Kroger East Cambridge",
+    "store_zip": "02141",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/bfdbfe/1e40af?text=2%25+Milk"
+  },
+  {
+    "product_id": "kg-004",
+    "product_name": "Large Eggs 12 Count",
+    "brand": "Kroger",
     "price": 2.99,
     "unit_price": 0.25,
-    "store_id": "kroger-001",
-    "store_name": "Kroger Local",
-    "store_zip": "02139",
-    "availability": "in_stock"
+    "store_id": "kroger-east-cambridge",
+    "store_name": "Kroger East Cambridge",
+    "store_zip": "02141",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/fef3c7/92400e?text=Eggs"
+  },
+  {
+    "product_id": "kg-005",
+    "product_name": "White Sandwich Bread 20 oz",
+    "brand": "Kroger",
+    "price": 2.49,
+    "unit_price": 0.12,
+    "store_id": "kroger-east-cambridge",
+    "store_name": "Kroger East Cambridge",
+    "store_zip": "02141",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/fed7aa/c2410c?text=Bread"
+  },
+  {
+    "product_id": "kg-006",
+    "product_name": "Salted Butter 16 oz",
+    "brand": "Lucerne",
+    "price": 4.99,
+    "unit_price": 0.31,
+    "store_id": "kroger-east-cambridge",
+    "store_name": "Kroger East Cambridge",
+    "store_zip": "02141",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/fef9c3/ca8a04?text=Butter"
+  },
+  {
+    "product_id": "kg-007",
+    "product_name": "Orange Juice 52 oz",
+    "brand": "Simply Orange",
+    "price": 4.49,
+    "unit_price": 0.086,
+    "store_id": "kroger-east-cambridge",
+    "store_name": "Kroger East Cambridge",
+    "store_zip": "02141",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/ffedd5/c2410c?text=OJ"
+  },
+  {
+    "product_id": "kg-008",
+    "product_name": "Oat Milk 1 Gallon",
+    "brand": "Oatly",
+    "price": 5.99,
+    "unit_price": 0.047,
+    "store_id": "kroger-east-cambridge",
+    "store_name": "Kroger East Cambridge",
+    "store_zip": "02141",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/d1fae5/065f46?text=Oat+Milk"
   }
 ]

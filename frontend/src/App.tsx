@@ -1,31 +1,47 @@
 import React, { useState } from 'react'
-import SearchForm from './components/SearchForm'
 import ShoppingList from './components/ShoppingList'
-import ResultsView from './components/ResultsView'
+import SearchPage from './pages/SearchPage'
+import Header from './components/Header'
+import Home from './pages/Home'
 
 export default function App() {
-  const [results, setResults] = useState<any>(null)
-  const [view, setView] = useState<'search' | 'list' | 'results'>('search')
+  const [view, setView] = useState<'home' | 'search' | 'list'>('home')
+  const [listVersion, setListVersion] = useState(0)
+  const [zip, setZip] = useState(() => localStorage.getItem('cartsaver:zip') || '02139')
+
+  function handleZipChange(z: string) {
+    setZip(z)
+    localStorage.setItem('cartsaver:zip', z)
+  }
+
+  function handleAddToList(listing: any) {
+    try {
+      const cur = JSON.parse(localStorage.getItem('cartsaver:list') || '[]')
+      cur.push({
+        product_id: listing.product_id || listing.id,
+        product_name: listing.product_name || listing.name,
+        quantity: 1,
+        store_id: listing.store_id,
+        store_name: listing.store_name,
+        price: Number(listing.price || 0),
+      })
+      localStorage.setItem('cartsaver:list', JSON.stringify(cur))
+    } catch { /* ignore */ }
+    setListVersion(v => v + 1)
+    setView('list')
+  }
 
   return (
-    <div style={{ padding: 24, fontFamily: 'Inter, system-ui, sans-serif' }}>
-      <header style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-        <h1 style={{ margin: 0 }}>CartSaver</h1>
-        <nav style={{ marginLeft: 'auto' }}>
-          <button onClick={() => setView('search')} style={{ marginRight: 8 }}>Search</button>
-          <button onClick={() => setView('list')} style={{ marginRight: 8 }}>Shopping List</button>
-          <button onClick={() => setView('results')}>Results</button>
-        </nav>
-      </header>
-
-      <main style={{ marginTop: 18 }}>
-        {view === 'search' && <>
-          <SearchForm onResults={(r) => { setResults(r); setView('results') }} />
-        </>}
-
-        {view === 'list' && <ShoppingList onOptimizeResult={(r) => { setResults(r); setView('results') }} />}
-
-        {view === 'results' && <ResultsView data={results} />}
+    <div className="cs-app">
+      <Header view={view} setView={setView} listVersion={listVersion} />
+      <main>
+        {view === 'home' && <Home onStart={() => setView('search')} />}
+        {view === 'search' && (
+          <SearchPage zip={zip} onZipChange={handleZipChange} onAddToList={handleAddToList} />
+        )}
+        {view === 'list' && (
+          <ShoppingList listVersion={listVersion} zip={zip} onOptimizeResult={() => setView('list')} />
+        )}
       </main>
     </div>
   )

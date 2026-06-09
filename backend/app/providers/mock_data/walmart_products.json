@@ -1,0 +1,98 @@
+[
+  {
+    "product_id": "wm-001",
+    "product_name": "Whole Milk 1 Gallon",
+    "brand": "Great Value",
+    "price": 3.28,
+    "unit_price": 0.026,
+    "store_id": "walmart-fresh-pond",
+    "store_name": "Walmart Fresh Pond",
+    "store_zip": "02138",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/dbeafe/1d4ed8?text=Milk"
+  },
+  {
+    "product_id": "wm-002",
+    "product_name": "2% Milk 1 Gallon",
+    "brand": "Great Value",
+    "price": 3.18,
+    "unit_price": 0.025,
+    "store_id": "walmart-fresh-pond",
+    "store_name": "Walmart Fresh Pond",
+    "store_zip": "02138",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/bfdbfe/1e40af?text=2%25+Milk"
+  },
+  {
+    "product_id": "wm-003",
+    "product_name": "Large Eggs 12 Count",
+    "brand": "Great Value",
+    "price": 2.78,
+    "unit_price": 0.23,
+    "store_id": "walmart-fresh-pond",
+    "store_name": "Walmart Fresh Pond",
+    "store_zip": "02138",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/fef3c7/92400e?text=Eggs"
+  },
+  {
+    "product_id": "wm-004",
+    "product_name": "White Sandwich Bread 20 oz",
+    "brand": "Great Value",
+    "price": 1.98,
+    "unit_price": 0.1,
+    "store_id": "walmart-fresh-pond",
+    "store_name": "Walmart Fresh Pond",
+    "store_zip": "02138",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/fed7aa/c2410c?text=Bread"
+  },
+  {
+    "product_id": "wm-005",
+    "product_name": "Salted Butter 16 oz",
+    "brand": "Land O'Lakes",
+    "price": 4.48,
+    "unit_price": 0.28,
+    "store_id": "walmart-fresh-pond",
+    "store_name": "Walmart Fresh Pond",
+    "store_zip": "02138",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/fef9c3/ca8a04?text=Butter"
+  },
+  {
+    "product_id": "wm-006",
+    "product_name": "Orange Juice 52 oz",
+    "brand": "Tropicana",
+    "price": 3.48,
+    "unit_price": 0.067,
+    "store_id": "walmart-fresh-pond",
+    "store_name": "Walmart Fresh Pond",
+    "store_zip": "02138",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/ffedd5/c2410c?text=OJ"
+  },
+  {
+    "product_id": "wm-007",
+    "product_name": "Almond Milk 1 Gallon",
+    "brand": "Great Value",
+    "price": 3.98,
+    "unit_price": 0.031,
+    "store_id": "walmart-fresh-pond",
+    "store_name": "Walmart Fresh Pond",
+    "store_zip": "02138",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/f3e8ff/7e22ce?text=Almond"
+  },
+  {
+    "product_id": "wm-008",
+    "product_name": "Large Eggs 18 Count",
+    "brand": "Great Value",
+    "price": 3.78,
+    "unit_price": 0.21,
+    "store_id": "walmart-fresh-pond",
+    "store_name": "Walmart Fresh Pond",
+    "store_zip": "02138",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/fef3c7/92400e?text=Eggs"
+  }
+]

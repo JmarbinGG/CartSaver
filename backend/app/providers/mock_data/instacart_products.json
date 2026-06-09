@@ -1,22 +1,98 @@
 [
   {
     "product_id": "ic-100",
-    "product_name": "Whole Milk 1 Gallon",
-    "price": 3.79,
-    "unit_price": 0.0,
-    "store_id": "inst-001",
-    "store_name": "Instacart Partner Store",
+    "product_name": "Organic Whole Milk 1 Gallon",
+    "brand": "Organic Valley",
+    "price": 5.99,
+    "unit_price": 0.047,
+    "store_id": "inst-whole-foods",
+    "store_name": "Whole Foods (Instacart)",
     "store_zip": "02139",
-    "availability": "in_stock"
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/dbeafe/1d4ed8?text=Milk"
+  },
+  {
+    "product_id": "ic-101",
+    "product_name": "Whole Milk 1 Gallon",
+    "brand": "Horizon Organic",
+    "price": 5.49,
+    "unit_price": 0.043,
+    "store_id": "inst-whole-foods",
+    "store_name": "Whole Foods (Instacart)",
+    "store_zip": "02139",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/dbeafe/1d4ed8?text=Milk"
+  },
+  {
+    "product_id": "ic-102",
+    "product_name": "2% Milk 1 Gallon",
+    "brand": "Fairlife",
+    "price": 4.99,
+    "unit_price": 0.039,
+    "store_id": "inst-whole-foods",
+    "store_name": "Whole Foods (Instacart)",
+    "store_zip": "02139",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/bfdbfe/1e40af?text=2%25+Milk"
   },
   {
     "product_id": "ic-200",
-    "product_name": "Large Eggs - 12ct",
-    "price": 3.19,
-    "unit_price": 0.27,
-    "store_id": "inst-001",
-    "store_name": "Instacart Partner Store",
+    "product_name": "Large Eggs 12 Count",
+    "brand": "Pete and Gerry's Organic",
+    "price": 5.49,
+    "unit_price": 0.46,
+    "store_id": "inst-whole-foods",
+    "store_name": "Whole Foods (Instacart)",
     "store_zip": "02139",
-    "availability": "in_stock"
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/fef3c7/92400e?text=Eggs"
+  },
+  {
+    "product_id": "ic-201",
+    "product_name": "Large Eggs 12 Count",
+    "brand": "365 by Whole Foods",
+    "price": 3.99,
+    "unit_price": 0.33,
+    "store_id": "inst-whole-foods",
+    "store_name": "Whole Foods (Instacart)",
+    "store_zip": "02139",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/fef3c7/92400e?text=Eggs"
+  },
+  {
+    "product_id": "ic-300",
+    "product_name": "Whole Wheat Bread 24 oz",
+    "brand": "Dave's Killer Bread",
+    "price": 5.99,
+    "unit_price": 0.25,
+    "store_id": "inst-whole-foods",
+    "store_name": "Whole Foods (Instacart)",
+    "store_zip": "02139",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/fed7aa/c2410c?text=Bread"
+  },
+  {
+    "product_id": "ic-400",
+    "product_name": "Salted Butter 16 oz",
+    "brand": "Kerrygold",
+    "price": 6.49,
+    "unit_price": 0.41,
+    "store_id": "inst-whole-foods",
+    "store_name": "Whole Foods (Instacart)",
+    "store_zip": "02139",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/fef9c3/ca8a04?text=Butter"
+  },
+  {
+    "product_id": "ic-500",
+    "product_name": "Oat Milk 1 Gallon",
+    "brand": "Planet Oat",
+    "price": 5.49,
+    "unit_price": 0.043,
+    "store_id": "inst-whole-foods",
+    "store_name": "Whole Foods (Instacart)",
+    "store_zip": "02139",
+    "availability": "in_stock",
+    "image_url": "https://placehold.co/80x80/d1fae5/065f46?text=Oat+Milk"
   }
 ]
